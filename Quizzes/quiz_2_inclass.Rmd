@@ -1,0 +1,68 @@
+---
+title: "quiz_2"
+author: "Jack Sylvia"
+date: "2/2/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+"All work presentd is my own, and I have followed all rules collaboration." - Jack Sylvia
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(here)
+
+df <- read_excel(here("data/slu_graduates_17_21.xlsx"))
+
+## fixes error in the data
+df <- df %>% mutate(across(everything(),
+                           .fns = ~replace(., . ==  "STATS" , "STAT")))
+
+df_Top10 <- df %>%
+  pivot_longer(c(3,4,5,6,7,8),
+               values_to = "discipline",
+               names_to = "type") %>%
+  filter(type == "major1" | type == "major2" | type == "major3") %>%
+  filter(!is.na(discipline)) %>%
+  group_by(discipline) %>%
+  summarise(nstudents = n()) %>%
+  arrange(desc(nstudents)) %>%
+  slice(1:10)
+```
+
+## Question 1
+
+```{r}
+ggplot(data = df_Top10, aes(x = reorder(discipline, nstudents), y = nstudents)) +
+  geom_point(size=1.5) + 
+  coord_flip() + 
+  geom_segment(aes(x=discipline, xend=discipline, y=0, yend=nstudents)) +
+  ylab("Top 10 most popular majors at SLU in the past five years") +
+  xlab("discipline")
+```
+
+##Question 2
+
+```{r}
+df_minors <- df %>%
+  filter(major1 == "STAT" | major2 == "STAT" | major3 == "STAT") %>%
+  pivot_longer(c(3,4,5,6,7,8),
+               values_to = "discipline",
+               names_to = "type") %>%
+  filter(type == "minor1" | type == "minor2" | type == "minor3") %>%
+  filter(discipline != "STAT" & !is.na(discipline)) %>%
+  group_by(discipline) %>%
+  summarise(nstudents = n()) %>%
+  arrange(desc(nstudents)) %>%
+  mutate(discipline = fct_reorder(discipline, nstudents))
+
+ggplot(data = df_minors, aes(x = discipline, y = nstudents)) +
+  geom_bar(stat = 'identity') + coord_flip() +
+  xlab("Minors") +
+  ylab("# of students")
+```
+
