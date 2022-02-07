@@ -1,0 +1,46 @@
+---
+title: "06-mapping-data"
+author: "Jack Sylvia"
+date: "2/7/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(maps)
+library(tidyverse)
+
+state_df <- ggplot2::map_data("state")
+ggplot(data = state_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(fill = "red") +
+  coord_map() +
+  xlab("") +
+  ylab("") +
+  theme_void()
+```
+
+```{r}
+library(usdata)
+state_stats
+```
+
+```{r}
+state_stats <- state_stats %>% mutate(state = str_to_lower(state))
+state_full <- left_join(state_df, state_stats, by = c("region" = "state"))
+state_stats <- state_stats %>% as_tibble %>% mutate(pop_change = ((pop2010-pop2000)/pop2000)*100)
+
+ggplot(data = state_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = pop_change)) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void() +
+  scale_fill_distiller(direction = 1)
+
+## fermenter is for binning continuous
+## brewer is for discrete colors
+## distiller is for continuous variable
+```
