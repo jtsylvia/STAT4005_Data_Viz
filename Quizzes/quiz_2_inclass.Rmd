@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-"All work presentd is my own, and I have followed all rules collaboration." - Jack Sylvia
+"All work presented is my own, and I have followed all rules collaboration." - Jack Sylvia
 
 ```{r}
 library(tidyverse)
@@ -45,7 +45,7 @@ ggplot(data = df_Top10, aes(x = reorder(discipline, nstudents), y = nstudents)) 
   xlab("discipline")
 ```
 
-##Question 2
+## Question 2
 
 ```{r}
 df_minors <- df %>%
@@ -64,5 +64,18 @@ ggplot(data = df_minors, aes(x = discipline, y = nstudents)) +
   geom_bar(stat = 'identity') + coord_flip() +
   xlab("Minors") +
   ylab("# of students")
+```
+
+## Question 3
+
+```{r}
+df_average <- df %>%
+  pivot_longer(c(3,4,5,6,7,8),
+               values_to = "discipline",
+               names_to = "type") %>%
+  filter(type == "major1" | type == "major2" | type == "major3") %>%
+  filter(!is.na(discipline))
+
+3689
 ```
 

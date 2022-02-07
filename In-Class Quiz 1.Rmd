@@ -1,0 +1,53 @@
+---
+title: "In-Class Quiz 1"
+author: "Jack Sylvia"
+date: "1/26/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+“All work presented is my own. I have not communicated with or worked with anyone else on this quiz.”
+
+Jack Sylvia
+
+1. Group 5 is the easiest to see the overall trend in the count because it is the only group that has a consistent baseline (of 0).
+<br>
+2.
+```{r}
+library(tidyverse)
+category <- rep(c("Group 1", "Group 2", "Group 3", "Group 4", "Group 5"), 7)
+time <- rep(c(2000, 2001, 2002, 2003, 2004, 2005, 2006), each = 5) 
+response <- rpois(length(category), 30)
+df <- tibble(category, time, response)
+
+ggplot(data = df, aes(x = time, y = response)) +
+  geom_col(aes(fill = category)) +
+  labs(y = "count") + facet_wrap(~ category)
+```
+<br>
+3a. A diverging color scale should be used because we are looking at percent change as well as the direction of movement in cases.
+<br>
+3b. We should use a sequential color scale as we are now using only concerned about cases -- the higher the number of the cases the higher the intensity of the color.
+<br>
+4. Compared to the first visualization at the top of the quiz, the <coordinate_function> parameter was adjuested to have the axes flipped. Also, there was an aesthetic mapping change made to have an axis read "response" instead of "count".
+<br>
+5a.
+```{r}
+ggplot(data = df, aes(x = time, y = response), colours("blue")) +
+  geom_point(colour = "blue")
+```
+
+Since you are not in the ggplot parentheses making an aesthetic mapping with geom_point will not work.
+<br>
+5b.
+```{r}
+ggplot(data = df, aes(x = time, y = response)) +
+  geom_point() +
+  geom_smooth(se = FALSE, span = 1.9)
+```
+
+Color was attached to category as aesthetic mapping. Taking that away allowed there to be just a single best fit plot.
+

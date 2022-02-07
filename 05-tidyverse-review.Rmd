@@ -1,0 +1,295 @@
+---
+title: "Tidyverse Review"
+author: "Jack Sylvia"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Sectopn 5.1: Billboard
+
+## Aside: Baseline of Zero?
+
+```{r}
+library(palmerpenguins)
+library(tidyverse)
+library(ggplot2)
+ggplot(data = penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  xlim(c(0,60)) +
+  ylim(c(0,25))
+```
+
+
+```{r}
+library(tidyverse)
+library(billboard)
+  head(wiki_hot_100s)
+#>   no                     title              artist year
+#> 1  1 Theme from A Summer Place         Percy Faith 1960
+#> 2  2          He'll Have to Go          Jim Reeves 1960
+#> 3  3             Cathy's Clown The Everly Brothers 1960
+#> 4  4              Running Bear      Johnny Preston 1960
+#> 5  5                Teen Angel        Mark Dinning 1960
+#> 6  6                 I'm Sorry          Brenda Lee 1960
+tail(wiki_hot_100s)
+#>       no                   title
+#> 5696  95 Adventure of a Lifetime
+#> 5697  96         Humble and Kind
+#> 5698  97                  Wicked
+#> 5699  98           Tiimmy Turner
+#> 5700  99           See You Again
+#> 5701 100                 Perfect
+#>                                  artist year
+#> 5696                           Coldplay 2016
+#> 5697                         Tim McGraw 2016
+#> 5698                             Future 2016
+#> 5699                          Desiigner 2016
+#> 5700 Wiz Khalifa featuring Charlie Puth 2016
+#> 5701                      One Direction 2016
+```
+
+
+```{r}
+wiki_top15 <- wiki_hot_100s %>% 
+  as_tibble() %>% 
+  filter(year <= 2009 & year >= 2000) %>%
+  group_by(artist) %>%
+  summarise(nsongs = n()) %>%
+  arrange(desc(nsongs)) %>%
+  slice(1:15) %>%
+  mutate(artist = fct_reorder(artist, nsongs))
+
+ggplot(data = wiki_top15, aes(x = artist, y = nsongs)) +
+  geom_col() + coord_flip()
+```
+
+## Exercise 2
+
+There is a problem for counting features. Any artist who has a song featuring a different artist will not have that song added to their overall total.
+
+## Exercise 3
+
+```{r}
+wiki_hot_100s %>% as_tibble() %>%
+  mutate(artist2 = str_remove(artist, 
+                              pattern = " featuring .*")) %>%
+  tail() %>%
+  print(width = Inf)
+
+```
+
+
+Saving for later....
+
+## Exercise 4/5
+
+```{r}
+ggplot(data = wiki_top15, aes(x = artist, y = nsongs)) +
+  geom_point(size=3, color = "green", shape=18) + 
+  coord_flip() + 
+  geom_segment(aes(x=artist, xend=artist, y=0, yend=nsongs-0.25), linetype="dotdash", colour="red") 
+```
+
+Using lollipop charts you can add much more artists to the chart while still have the visualization be legible. Having to many bars would be tougher to read.
+
+## Exercise 6
+
+```{r}
+library(rvest)
+library(tidyverse)
+## provide the URL and name it something (in this case, url).
+## paste0 pastes together the base URL and the year into a single string:
+## this will be useful in a moment
+get_wiki_100 <- function(year) {
+  
+  ## same code as before, replacing 2017 with year.
+  url <- paste0("https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_", year)
+  
+  h <- read_html(url)
+  
+  tab <- h %>% html_nodes("table")
+  df <- tab[[1]] %>% html_table() %>%
+    mutate(year = year)
+  
+  ## tell our function to return the dataframe `df`
+  return(df) 
+}
+
+year_list <- list(2017, 2018, 2019, 2020, 2021)
+year_list
+
+df_all <- map(year_list, get_wiki_100)
+df_all ## a list of data frames, one for each year
+
+df_2017_present <- bind_rows(df_all) ## combines rows                                        of the 5 new data                                       frames created
+df_2017_present <- df_2017_present %>%
+  mutate(Title = str_remove_all(Title, pattern = "\"")) %>% ## get rid of \ in title
+  rename(no = No., 
+         title = Title, 
+         artist = `Artist(s)`) ## make column names match with billboard package
+
+wiki_tibble <- as_tibble(wiki_hot_100s) %>% ## convert billboard data to tibble
+  mutate(year = as.numeric(year),
+         no = as.integer(no)) ## change variable types to match with scraped data
+
+hot100_df <- bind_rows(wiki_tibble, df_2017_present)
+```
+
+```{r}
+hot100_top15_df <- hot100_df %>% 
+  as_tibble() %>% 
+  filter(year <= 2019 & year >= 2010) %>%
+  group_by(artist) %>%
+  summarise(nsongs = n()) %>%
+  arrange(desc(nsongs)) %>%
+  slice(1:15) %>%
+  mutate(artist = fct_reorder(artist, nsongs))
+```
+
+```{r}
+ggplot(data = hot100_top15_df, aes(x = artist, y = nsongs)) +
+  geom_point(size=3, color = "red", shape=18) + 
+  coord_flip() + 
+  geom_segment(aes(x=artist, xend=artist, y=0, yend=nsongs-0.25), linetype="dotdash", colour="brown")
+```
+
+## Exercise 7
+
+The purpose of the "rvest" package is to make the process of scraping data from websites -- like Wikipedia just now -- much easier. We then use the functions in the "purr" package to manipulate the data from the scrape into a usable format. This involves adding vectors, changing titles, etc.
+
+
+```{r}
+install.packages("usethis")
+```
+
+## Section 5.2
+
+```{r}
+library(tidyverse)
+hpi_df <- read_csv("data/hpi-tidy.csv")
+```
+
+```{r}
+ggplot(data = hpi_df, aes(x = Footprint, y = Wellbeing)) +
+  geom_point()
+```
+
+```{r}
+hpi_us <- hpi_df %>% filter(Country == "United States of America")
+hpi_us
+```
+
+```{r}
+ggplot(data = hpi_df, aes(x = Footprint, y = Wellbeing)) +
+  geom_point() +
+  geom_label(data = hpi_us, aes(label = Country)) ## specify
+```
+
+```{r}
+library(ggrepel)
+library(plotly)
+ggplot(data = hpi_df, aes(x = Footprint, y = Wellbeing)) +
+  geom_point() +
+  geom_label_repel(data = hpi_us, aes(label = Country)) +
+  geom_point(data = hpi_us, size = 3, shape = 1) ## create a second point that is an open circle (shape = 1) with a larger size (size = 3) to surround the United States point on the scatterplot
+```
+
+
+```{r}
+plot1 <- ggplot(data = hpi_df, aes(x = Footprint, y = Wellbeing)) +
+  geom_point()
+```
+
+```{r}
+ggplotly(plot1)
+plot1 <- ggplot(data = hpi_df, aes(x = Footprint, y = Wellbeing,
+                                   label = Country)) +
+  geom_point()
+ggplotly(plot1, tooltip = "label")
+```
+
+```{r}
+plot2 <- ggplot(data = wiki_top15, aes(x = artist, y = nsongs, label = artist)) +
+  geom_col() + coord_flip()
+ggplotly(plot2, tooltip = "label")
+```
+
+## Exercise 3
+
+Advantages: interesting, allows user to explore
+Disadvantages: requires a computer, adds extra "Stuff", bad for making a particular point about a graph (like Western countries have a high footprint)
+
+## Exercise 4
+
+```{r}
+ggplot(data = hpi_df, aes(x = Footprint, y = HappyLifeYears, colour = Region)) +
+  geom_point() +
+  scale_colour_brewer(palette = "Accent")
+
+ggplot(data = hpi_df, aes(x = Footprint, y = HappyLifeYears, colour = Region)) +
+  geom_point() +
+  scale_colour_brewer(palette = "Dark 2")
+
+ggplot(data = hpi_df, aes(x = Footprint, y = HappyLifeYears, colour = Region)) +
+  geom_point() +
+  scale_colour_brewer(palette = "Oranges")
+```
+
+## Exercise 5
+
+```{r}
+ggplot(data = hpi_df, aes(x = Footprint, y = HappyLifeYears, colour = Region)) +
+  geom_point() +
+  scale_colour_viridis_d(option = "plasma")
+
+ggplot(data = hpi_df, aes(x = Footprint, y = HappyLifeYears, colour = Region)) +
+  geom_point() +
+  scale_colour_viridis_d(option = "plasma")
+```
+
+## Exercise 6
+
+```{r}
+?scale_colour_viridis_d
+```
+
+`_d` is for discrete values, `_c` is for continuous variables, and `_b` is for binning continuous variables.
+
+## Faceting
+
+Faceting is more useful if:
+
+*there are "more" categories (tough to differentiate across different colors)
+*if there is a lot of overlap in between the groups
+
+```{r}
+ggplot(data = hpi_df, aes(x = Footprint, y = HappyLifeYears)) +
+  geom_point() +
+  facet_wrap( ~ Region)
+```
+
+```{r}
+library(palmerpenguins)
+ggplot(data = penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(colour = species)) ## colour is good enough here
+#> Warning: Removed 2 rows containing missing values
+#> (geom_point).
+```
+
+```{r}
+colour_bad <- tibble(x = rnorm(500, 0, 1), y = rnorm(500, 0, 1),
+       groupvar = c(rep("A", 50), rep("B", 50),
+                    rep("C", 50), rep("D", 50),
+                    rep("E", 50), rep("F", 50), rep("G", 50),
+                    rep("H", 50), rep("I", 50), rep("J", 50)))
+
+ggplot(data = colour_bad, aes(x = x, y = y, colour = groupvar)) +
+  geom_point() + ## can't distinguish anything really: colour is bad
+  geom_smooth(se = FALSE)
+#> `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+
