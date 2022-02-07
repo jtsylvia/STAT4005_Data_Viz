@@ -1,0 +1,57 @@
+---
+title: "erxercises-03"
+author: "Jack Sylvia"
+date: "2/6/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Section 8.1.2: General Principles 
+
+#### Exercise 1
+
+The "Covid Cases" graphic is not ethical because the x-axis was manipulated to show a decreasing trend in COVD-19 cases. This was done by not ordering in chronological fashion while also reshuffling each county's bar for each date. The graphic was probably construed this way to show that Georgia's reopening plan was going well -- it certainly was not.
+
+#### Exercise 2
+
+"Clearly identify the questions and objectives that drive each project and use to guide both planning and refinement."
+
+"Be open to changing our methods and conclusions in response to new knowledge."
+
+Scenario: A left-wing news agency receives polling data that a Republican candidate for Senate is leading a race by a double-digit margin. Is the goal to tell the truth or to present data that puts Democrats in a good light? Are you open to presenting the new data?
+
+#### Exercise 3a
+
+https://static01.nyt.com/images/2021/10/28/us/virus-breakthrough-data-promo-1635434369929/virus-breakthrough-data-promo-1635434369929-superJumbo-v4.png
+
+#### Exercise 3b
+
+https://wset.com/resources/media/161758e3-db42-41bc-a905-6cecce0bae20-large1x1_COVID19infectionratebasedonvaxxstatus.PNG?1632848829040
+
+This is the best I could find.....
+
+
+## Section 8.2: Sensitive Data Viz
+
+#### Exercise 1
+
+I believe the second example better humanizes the victims of lynchings. Each victim is given a data point that you can click on to see their story. The other visualization is just a heat map of the amount of lynchings and does not humanize the victims as well,
+
+#### Exercise 2
+
+You could humanize the victims by creating a bar chart with lynchings by state where each bar is summed in segments of 10 people. In the legend, it would say that each block stands for "10 lives".
+
+#### Exercise 3
+
+1. Presenting data can sometimes present harmful side effects. (See TayTweets)
+
+2. When using elements of charts that include "color, composition, line, symbols, type, and interactivity", you should utilize them in a way that does not spur up negative stereotypes in society.
+
+3. Do everything you can to do the right thing.
+
+#### Exercise 4
+
+The graphic humanizes the victims instead of just providing a tally of the number of people killed. You can see the gray lines which show the projected years of experiences people lost due to gun violence.
