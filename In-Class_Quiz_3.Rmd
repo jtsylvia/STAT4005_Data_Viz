@@ -1,0 +1,32 @@
+---
+title: "In-Class_Quiz_3"
+author: "Jack Sylvia"
+date: "2/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+“All work presented is my own. I have not communicated with or worked with anyone else on this quiz.” - Jack Sylvia
+
+## Question 1
+
+The error occurs because the local repository has different readme file than the one on GitHub. First, you must pull the readme file from GitHub to the local repository on your desktop. Then, you can commit the changes and push them to GitHub.
+
+## Question 2
+
+An advantage of GitHub is that it is version control software. If you make a change in your code to where an .rmd will not knit or code won't run, you have the ability to go back to a previous version where the code did work. Another advantage of GitHub is that it makes collaborating on projects much easier. You can send work to a repository where everybody working on the project can access.
+
+## Question 3
+
+I believe principle 7 might be the hardest to follow. Everybody has biases in specific areas in life and it is hard to eliminate them because beliefs hold strong attachment. As a infantile example, if people were creating a data visualization for college football, they might have bias toward their favorite team.
+
+## Question 4
+
+The authors of "Data Feminism" used a gun violence data visualization to illustrate the projected lost years on each victim's life. They humanized the data instead of treating each gun violence victim as a data point. 
+
+However, an argument against "embracing emotion" is that when you use this technique it can be easy to see trends that don't really exist purely because it impacts you emotionally.
+
+
