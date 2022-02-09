@@ -1,0 +1,37 @@
+---
+title: "Quiz3_TakeHome"
+author: "Jack Sylvia"
+date: "2/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+“All work presented is my own, and I have followed all rules for collaboration.” -Jack Sylvia
+
+## Question 1
+
+The visualization itself is still unethical even though there was no harmful intent. It's like saying you did not plagiarize because you did not mean  to copy/paste text without citing the source -- it is still plagiarism. 
+
+Data from the chart was excluded without a good reason and it was not explicitly stated why the points were removed. Therefore, I believe the visualization is still unethical.
+
+## Question 2
+
+https://www.ft.com/__origami/service/image/v2/images/raw/https%3A%2F%2Fd1e00ek4ebabms.cloudfront.net%2Fproduction%2Ffa542f01-115d-4fd2-8748-c6a5cf0dff81.png?source=next-opengraph&fit=scale-down&width=900
+
+This data visualizaion is unethical because it is manipulated to the bias of the news station. This is done by changing the range of the y-axis. Instead of trying to mitigate bias to see what the data is saying, Tucker Carlson molds the data to his own point of view -- that there is an attack on Christianity.
+
+## Question 3
+
+Commit - This function makes a record of the changes in the file/repository since the previous commit.
+
+Push - This function sends all the commits made on your repository to your GitHub account.
+
+Pull - This function takes files from your GitHub repository and brings to them to RStudio (local repository).
+
+## Question 4
+
+Hopefully this was done correctly.
+
