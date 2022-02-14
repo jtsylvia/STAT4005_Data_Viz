@@ -1,0 +1,83 @@
+---
+title: "exercise-04"
+author: "Jack Sylvia"
+date: "2/13/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 1
+
+```{r, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(sf)
+hpi_df <- read_csv("data/hpi-tidy.csv")
+```
+
+```{r}
+world <- map_data("world")
+
+world_df <- ggplot2::map_data("world")
+
+world_full <- left_join(world_df, hpi_df, by = c("region" = "Country"))
+
+ggplot(data = world_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = LifeExpectancy)) +
+  coord_map(projection = "mercator") +
+  theme_void() +
+  scale_fill_distiller(direction = 1)
+```
+
+
+## Exercise 2
+
+```{r}
+world_full[is.na(world_full)] = 78.5
+
+## USA is colored in but so are other countries with na values. Using this method even though it is incorrect bc I could not figure out correct way.
+  
+ggplot(data = world_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = LifeExpectancy)) +
+  coord_map(projection = "mercator") +
+  theme_void() +
+  scale_fill_distiller(direction = 1)
+```
+
+
+## Exercise 3
+
+```{r}
+ggplot(data = world_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = LifeExpectancy)) +
+  coord_map(projection = "mercator", xlim = c(-180,180)) +
+  theme_void() +
+  scale_fill_distiller(direction = 1)
+```
+
+
+## Exercise 4
+
+Greenland is 550% too big as the country should be able to fit into Africa 14 times. However, the projection certainly does not make it look like it does. 
+
+## Exercise 5
+
+```{r}
+ggplot(data = world_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "red") +
+  coord_map(projection = "globular") +
+  theme_void() +
+  scale_fill_distiller(direction = 1)
+
+ggplot(data = world_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "red") +
+  coord_map(projection = "gilbert") +
+  theme_void() +
+  scale_fill_distiller(direction = 1)
+
+```
+
+In "globular", the ratio of Greenland's size to Africa's size is much smaller than in the "gilbert" projection.
