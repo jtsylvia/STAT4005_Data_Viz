@@ -130,8 +130,80 @@ statsurvey_new <- statsurvey_df %>%
   filter(Tattoo == "Yes") %>%
   mutate(prop = ncount / ntotal, se = sqrt(prop * (1 - prop) / ntotal), l_se = prop - se, u_se = prop + se)
 
-  
+statsurvey_tattoo <- statsurvey_new %>% separate(time_both, into = c("semester", "year"), sep = 1) %>%
+  arrange(year, desc(semester)) %>%
+  unite(col = "time_both", c(semester, year)) %>%
+  mutate(time_both = fct_inorder(time_both))
 
+ggplot(data = statsurvey_tattoo, aes(x = time_both, y = prop)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = l_se, ymax = u_se))
+  
+```
+
+## Grade Inflation at SLU?
+
+```{r}
+statsurvey_GPA <- statsurvey_df %>%
+  filter(time_year >= 13) %>%
+  drop_na(GPA) %>%
+  group_by(time_both) %>%
+  mutate(ncount = n()) %>%
+  mutate(Avg_GPA = mean(GPA)) %>%
+  select(time_both, ncount, Avg_GPA) %>%
+  mutate(se = sqrt(Avg_GPA) / ncount, l_se = Avg_GPA - se, u_se = Avg_GPA + se)
+
+statsurvey_GPA <- statsurvey_GPA %>% separate(time_both, into = c("semester", "year"), sep = 1) %>%
+  arrange(year, desc(semester)) %>%
+  unite(col = "time_both", c(semester, year)) %>%
+  mutate(time_both = fct_inorder(time_both))
+
+ggplot(data = statsurvey_GPA, aes(x = time_both, y = Avg_GPA)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = l_se, ymax = u_se))
+  
+  
+```
+
+
+
+## NFL example
+
+```{r}
+nfl_df <- read_csv("data/standings.csv")
+#> Rows: 638 Columns: 15
+#> ── Column specification ────────────────────────────────────
+#> Delimiter: ","
+#> chr  (4): team, team_name, playoffs, sb_winner
+#> dbl (11): year, wins, loss, points_for, points_against, ...
+#> 
+#> ℹ Use `spec()` to retrieve the full column specification for this data.
+#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+nfl_df <- mutate(nfl_df, win_perc = 100*(wins / (wins + loss)))
+
+
+nfl_sum <- nfl_df %>% group_by(team) %>%
+  summarise(nwins = sum(wins),
+            nlosses = sum(loss)) %>%
+  mutate(ngames = nwins + nlosses,
+         win_percentage = 100 * nwins / ngames) %>%
+  mutate(team = fct_reorder(team, win_percentage))
+
+nfl_both <- left_join(nfl_df, nfl_sum) %>%
+  mutate(team = fct_reorder(team, win_percentage))
+
+ggplot(data = nfl_sum, aes(x = team, y = win_percentage)) +
+  geom_point() +
+  geom_segment(aes(x = team, xend = team, y = 0, yend = win_percentage)) +
+  coord_flip() +
+  labs(y = "Win Percentage")
+
+ggplot(data = nfl_both, aes(x = team, y = win_perc)) +
+  geom_point(alpha = 0.2) + 
+  geom_point(data = nfl_sum, aes(y = win_percentage), colour = "Overall Win Percent") +
+  coord_flip() +
+  scale_colour_manual(values = c("Overall Win Percent" = "red"))
 ```
 
 
