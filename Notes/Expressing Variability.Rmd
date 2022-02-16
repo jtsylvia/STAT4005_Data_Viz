@@ -1,0 +1,137 @@
+---
+title: "Expressing Variability"
+author: "Jack Sylvia"
+date: "2/14/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+pokemon_df <- read_csv("data/pokemon_full.csv")
+pokemon_height <- pokemon_df %>% 
+  filter(Type %in% c("Bug", "Electric", "Fighting", "Flying",
+                     "Grass", "Steel")) %>%
+  group_by(Type) %>%
+  summarise(avg_height = mean(height)) %>%
+  mutate(Type = fct_reorder(Type, avg_height))
+ggplot(data = pokemon_height, aes(x = Type, y = avg_height)) +
+  geom_col() +
+  coord_flip()
+
+pokemon_small <- pokemon_df %>% 
+  filter(Type %in% c("Bug", "Electric", "Fighting", "Flying",
+                     "Grass", "Steel")) %>%
+  group_by(Type) %>%
+  mutate(meanheight = mean(height, na.rm = TRUE)) %>%
+  ungroup() %>%
+  arrange(meanheight) %>%
+  mutate(Type = fct_inorder(Type))
+```
+
+## Exercise 1
+
+Missing sample size for each type and we cannot see the variability/distribution of heights for each type.
+
+## Exercise 2
+
+```{r}
+ggplot(data = pokemon_small, aes(x = Type, y = height)) +
+  geom_point(alpha = 0.3) +
+  coord_flip() +
+  geom_point(data = pokemon_height, aes(y = avg_height), colour = "red")
+```
+
+## Exercise 3
+
+Media has to consider statistical knowledge of audience. Sometimes you do not actually have the underlying data: only summary stats.
+
+## Exercise 4
+
+```{r}
+## install.packages("openintro")
+library(openintro)
+data(mlb_players_18)
+mlb_sum <- mlb_players_18 %>% group_by(position) %>%
+  summarise(med_hr = median(HR)) %>%
+  mutate(position = fct_reorder(position, med_hr))
+ggplot(data = mlb_sum, aes(x = position, y = med_hr)) +
+  geom_col() +
+  coord_flip()
+
+```
+
+```{r}
+mlb_players_18 <- mlb_players_18 %>%
+  mutate(position = fct_reorder(position, HR, .fun = median))
+
+mlb_sum -> mutate()
+
+## USEFUL CODE FOR FUTURE ABOVE ##
+
+ggplot(data = mlb_players_18, aes(x = position, y = HR)) +
+  geom_point() +
+  coord_flip() +
+  geom_point(data = mlb_sum, aes(y = med_hr), colour = "green")
+```
+
+
+## Exercise 5
+
+```{r}
+library(plotly)
+
+p1 <- ggplot(data = mlb_players_18, aes(x = position, y = HR, label = nplayers)) +
+   geom_boxplot() +
+  coord_flip()
+
+ggplotly(p1, tooltip = "label")
+
+mlb_players_18 %>% group_by(position) %>%
+  mutate(nplayers = n())
+```
+
+## Section 7.3
+
+```{r}
+library(here)
+statsurvey_df <- read_csv(here("data/stat113_survey.csv"))
+```
+
+```{r}
+statsurvey_df
+
+statsurvey_new <- statsurvey_df %>% 
+  filter(time_year >= 13) %>%
+  drop_na(Tattoo) %>%
+  mutate()
+
+ggplot(data = statsurvey_new, aes(x = time_both, fill = Tattoo)) +
+  geom_bar()
+
+## use fct_inorder() to order time_both variable
+##
+## 1. compute the proportion and sample size for each year
+## 2. compute se for each year and adding it and subtracting if from the proportion
+## 3. use a geom to plot the standard errors
+
+statsurvey_new <- statsurvey_df %>% 
+  filter(time_year >= 13) %>%
+  drop_na(Tattoo) %>%
+  group_by(time_both, Tattoo) %>%
+  summarise(ncount = n()) %>%
+  ungroup() %>%
+  group_by(time_both) %>%
+  mutate(ntotal = sum(ncount)) %>%
+  ungroup() %>%
+  filter(Tattoo == "Yes") %>%
+  mutate(prop = ncount / ntotal, se = sqrt(prop * (1 - prop) / ntotal), l_se = prop - se, u_se = prop + se)
+
+  
+
+```
+
+
