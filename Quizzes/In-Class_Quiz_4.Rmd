@@ -1,0 +1,39 @@
+---
+title: "In-Class_Quiz_4"
+author: "Jack Sylvia"
+date: "2/16/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+“All work presented is my own. I have not communicated with or worked with anyone else on this quiz.” -Jack Sylvia
+
+## Question 1
+
+```{r, message=FALSE}
+library(tidyverse)
+library(here)
+library(ggplot2)
+alcohol_df <- read_csv(here("data/alcohol.csv"))
+```
+
+```{r}
+world <- map_data("world")
+world_df <- ggplot2::map_data("world")
+
+world_full <- left_join(world_df, alcohol_df, by = c("region" = "country"))
+
+ggplot(data = world_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = beer_servings)) +
+  coord_map(projection = "mercator", xlim = c(-180,180)) + ## Mercator projection because you can see all countries clearly
+  theme_void() +
+  scale_fill_distiller(direction = 1)
+```
+
+## Question 2
+
+If your question of interest was how alcohol consumption has changed around the world over time, it would be more useful to see several scatter plot for regions of the world over time instead of having a bunch of different maps. It is easier to see trends in a single scatter plot than trying to find them in multiple maps.
+
