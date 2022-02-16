@@ -27,7 +27,7 @@ library(leaflet)
 capital_map <- leaflet(capital_cities_df) %>%
   setView(lng = -98.583, lat = 39.833, zoom = 4) %>% 
   addTiles() %>% 
-  addProviderTiles(providers$Esri.WorldTerrain) %>% 
+  addProviderTiles(providers$Stamen.Watercolor) %>% 
   addMarkers(lng = capital_cities_df$long, lat = capital_cities_df$lat,
              popup = paste(capital_cities_df$name, ",", "Population:", capital_cities_df$pop))
 
