@@ -1,0 +1,39 @@
+---
+title: "Quiz4_TakeHome"
+author: "Jack Sylvia"
+date: "2/15/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+“All work presented is my own, and I have followed all rules for collaboration.” 
+- Jack Sylvia
+
+```{r, include=FALSE}
+library(tidyverse)
+library(maps)
+library(ggplot2)
+data("us.cities")
+capital_cities_df<- filter(us.cities, capital == 2)
+```
+
+
+```{r, echo=FALSE}
+library(leaflet)
+
+capital_map <- leaflet(capital_cities_df) %>%
+  setView(lng = -98.583, lat = 39.833, zoom = 4) %>% 
+  addTiles() %>% 
+  addProviderTiles(providers$Esri.WorldTerrain) %>% 
+  addMarkers(lng = capital_cities_df$long, lat = capital_cities_df$lat,
+             popup = paste(capital_cities_df$name, ",", "Population:", capital_cities_df$pop))
+
+capital_map
+```
+
+
+
+
