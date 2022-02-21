@@ -1,0 +1,24 @@
+---
+title: "exercise-05"
+author: "Jack Sylvia"
+date: "2/20/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 1
+
+The app allows the user to change four aspects of each of the charts: sample size (N), intercept, slope, and the standard deviation of residuals.
+
+## Exercise 2
+
+The outputs of the app seem to include both graphs and tables.
+
+## Exercise 3
+
+The app I chose output colleges and universities in the U.S. with NCAA affiliated swimming programs. The app allows the user to sort for colleges based on region, division, gender, school characteristics, and average event time. The output includes a map of the region(s) you selected with colleges color-coded by division.  
+
+One interesting thing I found is that you can sort colleges based on your own swimming times. This shows where you rank skill-wise to colleges that would be a good fit.
