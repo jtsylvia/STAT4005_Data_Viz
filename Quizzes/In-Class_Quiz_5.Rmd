@@ -1,0 +1,57 @@
+---
+title: "In-Class_Quiz_5"
+author: "Jack Sylvia"
+date: "2/23/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+“All work presented is my own. I have not communicated with or worked with anyone else on this quiz.” - Jack Sylvia
+
+## Question 1
+
+The first graph is appropriate to construct as it shows the amount of samples from each species. The second graph is not appropriate because you cannot discern whether a species has 2 or 2,000,000 penguins -- making the average given less useful to interpret.
+
+## Question 2
+
+```{r}
+library(here)
+library(tidyverse)
+hpi_df <- read_csv(here("data/hpi-tidy.csv"))
+
+hpi_new_df <- hpi_df %>% 
+  group_by(Region) %>%
+  summarise(
+    AvgGDP_person = mean(GDPcapita)
+  )
+
+ggplot(data = hpi_new_df, aes(x = Region, y = AvgGDP_person)) +
+  geom_point() + 
+  coord_flip()
+```
+
+## Question 3
+
+```{r}
+hpi_Q3_df <- hpi_df %>% 
+  group_by(Region) %>%
+  summarise(
+    GDPcapita_low = min(GDPcapita),
+    GDPcapita_high = max(GDPcapita),
+    AvgGDP_person = mean(GDPcapita)
+  )
+
+ggplot(data = hpi_Q3_df, aes(x = Region, y = AvgGDP_person)) +
+  geom_point() + 
+  coord_flip() +
+  geom_point(aes(y = GDPcapita_low), colour = "red") +
+  geom_point(aes(y = GDPcapita_high), colour = "blue") +
+  labs(
+         red = "GDPcapita_low",
+         black = "AvgGDP_person",
+         blue = "GDPcapita_high"
+        )
+```
