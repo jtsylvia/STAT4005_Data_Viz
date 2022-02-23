@@ -1,0 +1,72 @@
+---
+title: "Quiz5_TakeHome"
+author: "Jack Sylvia"
+date: "2/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+“All work presented is my own, and I have followed all rules for collaboration.”
+- Jack Sylvia
+
+## Part 1
+```{r, include=FALSE}
+library(tidyverse)
+library(here)
+STAT113_df <- read.csv(here("data/stat113_survey.csv"))
+```
+
+```{r, message=FALSE}
+STAT113_new_df <- STAT113_df %>%
+  filter(time_year >= 13) %>%
+  separate(time_both, into = c("semester", "year"), sep = 1) %>%
+  arrange(year, semester) %>%
+  unite(col = "time_both", c(semester, year)) %>%
+  mutate(time_both = fct_inorder(time_both)) %>%
+  select(time_both, Facebook) %>%
+  filter(!is.na(Facebook)) %>%
+  filter(Facebook > 0)
+
+STAT113_FacebookAvg_df <- STAT113_new_df %>%
+  group_by(time_both) %>%
+  summarise(
+    Facebook = mean(Facebook)
+  )
+```
+
+```{r}
+ggplot(data = STAT113_new_df, aes(x = time_both, y = Facebook)) +
+  geom_point(alpha = 0.2) +
+  coord_flip() +
+  geom_point(data = STAT113_FacebookAvg_df, colour = "red") +
+  ylab("Number of Facebook Friends")
+```
+
+## Part 2
+
+```{r, message=FALSE}
+STAT113_Part2_df <- STAT113_df %>%
+  filter(time_year >= 13) %>%
+  separate(time_both, into = c("semester", "year"), sep = 1) %>%
+  arrange(year, semester) %>%
+  unite(col = "time_both", c(semester, year)) %>%
+  mutate(time_both = fct_inorder(time_both)) %>%
+ group_by(time_both) %>%
+  mutate(
+    ncount = n(),
+    FacebookUser = if_else(Facebook > 0, 1,0)
+    ) %>%
+  filter(!is.na(Facebook)) %>%
+  mutate(prop = sum(FacebookUser) / ncount, se = sqrt(prop * (1 - prop) / ncount), l_se = prop - se, u_se = prop + se)
+```
+
+```{r}
+ggplot(data = STAT113_Part2_df, aes(x = time_both, y = prop)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = l_se, ymax = u_se)) + coord_flip() + 
+  ylab("Proportion of Facebook Users")
+```
+
