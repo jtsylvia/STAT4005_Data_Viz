@@ -80,6 +80,8 @@ server <- function(input, output, session) {
 
 shinyApp(ui, server)
 
+##Did not figure out how to add secondary table
+
 ## advantages of static over interactive
 ## easier to present or to send to someone
 ## more user-friendly
