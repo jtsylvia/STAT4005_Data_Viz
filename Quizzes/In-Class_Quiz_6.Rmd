@@ -18,9 +18,9 @@ A static graph may be better if you are trying to show a certain trend happened 
 ## Question 2
 
 ```{r}
-library(shiny); library(tidyverse)
-atp_df <- read_csv("data/atp_matches_2019.csv")
-wta_df <- read_csv("data/wta_matches_2019.csv")
+library(shiny); library(tidyverse); library(here)
+atp_df <- read_csv(here("data/atp_matches_2019.csv"))
+wta_df <- read_csv(here("data/wta_matches_2019.csv"))
 both_df <- bind_rows(atp_df, wta_df)
 
 both_long <- both_df %>% pivot_longer(c(winner_name, loser_name))
