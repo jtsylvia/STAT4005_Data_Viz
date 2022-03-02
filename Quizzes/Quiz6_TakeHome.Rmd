@@ -1,0 +1,50 @@
+---
+title: "In-Class_Quiz_6"
+author: "Jack Sylvia"
+date: "3/1/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(shiny)
+nfl_salary <- read_csv("data/nfl_salary.csv")
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+      radioButtons("positionchoice", label = "Position", choices = c("Cornerback", "Defensive Lineman", "Linebacker", "Offensive Lineman", "Quarterback", "Running Back", "Safety", "Special Teamer", "Tight End", "Wide Receiver")),
+      sliderInput("yearnumber", label = "Year", min = 2011, max = 2018, value = 2014, step = 1, sep = "")),
+    mainPanel(plotOutput("position_plot"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  
+  df_update <- reactive({
+    
+    nfl_stat <- nfl_salary %>% filter(year == input$yearnumber)
+
+  })
+  
+  nfl_plot <- reactive({
+    ggplot(data = df_update(), aes(x = .data[[input$positionchoice]])) +
+             geom_density(colour = "red") + xlab("Salary in $")
+           
+  })
+  
+  output$position_plot <- renderPlot({
+    nfl_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+The purpose of this app is to display the distribution of salaries of NFL players by position -- further specified by year.
