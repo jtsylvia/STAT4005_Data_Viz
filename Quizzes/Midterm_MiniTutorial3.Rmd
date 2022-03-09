@@ -1,0 +1,46 @@
+---
+title: "Midterm_MiniTutorial3"
+author: "Jack Sylvia"
+date: "3/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+The purpose of this section is to learn how to convey variability in graphs. In the previouse tutorials, there were only single numbers indicated and they did not illustrate what the distribution of values might look. To help illustrate this, we will be using the NCAA Basketball data again.
+
+```{r, message=FALSE}
+library(tidyverse)
+library(here)
+NCAA_df <- read.csv(here("data/ncaa-team-data.csv"))
+
+NCAA_new <- NCAA_df %>%
+  separate(season, into = c("year", "year plus one", "Delete"), sep = "-") %>%
+  select(-c("year plus one", "Delete"))
+
+NCAA_Main <- NCAA_new %>%
+  filter(year >= 2012) %>%
+  filter(conf == "SEC" | conf == "Big 12" | conf == "Big Ten" | conf == "Pac-12" | conf == "ACC") %>%
+  group_by(conf) %>%
+  summarise(meanWL = mean(wl),
+  TotalW = sum(w),
+  TotalGames = sum(w) + sum(l)
+            ) %>%
+  ungroup() %>%
+  mutate(se = sqrt(meanWL * (1 - meanWL) / TotalGames), l_se = meanWL - se, u_se = meanWL + se)
+```
+
+The first step to expressing variability is tidying your data set so that it includes some variability measures that can be plotted. In the R chunk above, I used dplyr to create an NCAA basketball data set that includes wins and losses in the five major conferences since 2012. I was able to find the average Win/Loss ratio for each conference as well as the standard error...our variability measure in this case. Now it is time to graph out data using ggplot.
+
+```{r}
+ggplot(data = NCAA_Main, aes(x = conf, y = meanWL)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = l_se, ymax = u_se))
+```
+
+Through this method, we can see that the variability between conferences is really similar in regards to Win/Loss percentage.
+
+This is one way of illustrating data variability in graphs.
