@@ -81,7 +81,7 @@ ggplot(data = NCAA_4teams, aes(x = year)) +
   ylab("wins") + facet_wrap(~ school) 
 ```
 
-The last topic I am going to discuss is using color. Sometimes it useful in scatterplors to deploy the use of color if you have multiple groups you are trying to show. An example of a scatterplot using color is shown below.
+The last topic I am going to discuss is using color. Sometimes it is useful in scatterplots to deploy the use of color if you have multiple groups you are trying to show. An example of a scatterplot using color is shown below.
 
 ```{r}
 ggplot(data = NCAA_4teams, aes(x = year, y = w, color = school)) + 
