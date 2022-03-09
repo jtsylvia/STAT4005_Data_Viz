@@ -1,0 +1,92 @@
+---
+title: "Midterm_MiniTutorial1"
+author: "Jack Sylvia"
+date: "3/7/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+“All work presented is my own. I have not communicated with or worked with anyone else on this exam.” - Jack Sylvia
+
+## Mini-Tutorial 1
+
+The goal of this mini-tutorial is to get you used to some common techniques used to visualize data. We will be using NCAA Basketball data for our examples in this section.
+
+```{r, message=FALSE}
+library(tidyverse)
+library(here)
+NCAA_df <- read.csv(here("data/ncaa-team-data.csv"))
+
+NCAA_new <- NCAA_df %>%
+  separate(season, into = c("year", "year plus one", "Delete"), sep = "-") %>%
+  select(-c("year plus one", "Delete"))
+
+
+```
+
+When visualizing data in R, the ggplot2 package is probably the best package to use. The package contains its own "Grammar of Graphics" which describes the components that create the visualizations. To show this, I will create a sample visualization below using a subset of some NCAA Basketball data. 
+
+```{r}
+NCAA_Michigan <- NCAA_new %>%
+  filter(school == "michigan") %>%
+  filter(year >= 2000)
+
+library(ggplot2)
+
+ggplot(data = NCAA_Michigan, aes(x = year, y = w)) + 
+         geom_point() +
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ylab("wins") +
+  scale_color_brewer()
+```
+
+The seven parameters in the grammar of graphics are: 
+
+Data - In the output above, the data used for the plot is indicated inside the ggplot function.
+
+Mappings - An aesthetic mapping shows how variables in the data are related to visualization itself. In our example, the year variable is fixed to the x-axis and wins to the y-axis.
+
+geom_function - This parameter indicates how the data will be plotted. In this case, our "geom_point" tells R to illustrate a scatter plot.
+
+Stat - A statistical transformation onto the existing plot. 
+
+Position - Alters the position of any existing element.
+
+Facet_function - This parameter is used to create subplots based upon different levels of a group
+
+Coordinate_function - This allows you to change coordinate system. Our plot is in cartesian form by default.
+
+<br>
+
+```{r, message=FALSE}
+NCAA_4teams <- NCAA_new %>%
+  filter(school == "michigan" | school == "arizona-state" | school == "michigan-state" | school == "rutgers") %>%
+  filter(year >= 2012)
+
+ggplot(data = NCAA_4teams, aes(x = year, fill = school)) + 
+         geom_bar(aes(x=year,y=w),stat="identity") +
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ylab("wins")
+```
+
+One thing in data visualization you want to avoid is an inconsistent baseline. Aside from Rutgers, its tough to see how wins are changing over time for the other teams in the plot above. Sometimes it is better to facet as seen below
+
+```{r}
+ggplot(data = NCAA_4teams, aes(x = year)) + 
+         geom_bar(aes(x=year,y=w),stat="identity") +
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ylab("wins") + facet_wrap(~ school) 
+```
+
+The last topic I am going to discuss is using color. Sometimes it useful in scatterplors to deploy the use of color if you have multiple groups you are trying to show. An example of a scatterplot using color is shown below.
+
+```{r}
+ggplot(data = NCAA_4teams, aes(x = year, y = w, color = school)) + 
+         geom_point() +
+  theme(axis.text.x = element_text(angle = 90)) + 
+  ylab("wins")
+```
+
