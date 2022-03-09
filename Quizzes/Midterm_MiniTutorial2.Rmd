@@ -55,4 +55,4 @@ ggplot(data = ny_full, aes(x = long, y = lat, group = group)) +
 
 The above map shows the average family size by county in the state of NY. Unfortunately there is no data for St. Lawrence county.
 
-*.rmd will not knit because it cannot load the "county_2019" df for some reason. I hope the .rmd is sufficient.*
+* .rmd will not knit because it cannot load the "county_2019" df for some reason. I hope the .rmd is sufficient. *
