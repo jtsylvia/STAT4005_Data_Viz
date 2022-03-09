@@ -1,0 +1,58 @@
+---
+title: "Midterm_MiniTutorial2"
+author: "Jack Sylvia"
+date: "3/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The goal of this section is getting used to  the "maps" package in R to illustrate data.
+
+The "maps" package contains data frames for various different landmass that includes latitude, longitude, region, and other variables that you can use ggplot to visualize. However, instead of plotting data to interpret, you can use it to create maps! An example is shown below:
+
+```{r}
+library(maps)
+library(tidyverse)
+library(tibble)
+county <- tibble(county_2019)
+county_df <- ggplot2::map_data("county") %>%
+  filter(region == "new york")
+ggplot(data = county_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(fill = "#99badd") +
+  coord_map() +
+  xlab("") +
+  ylab("") +
+  theme_void()
+```
+
+The code above takes mapping data from the "maps" package for the state of NY and stores it as an object. This object is then used inside ggplot while using latitude as the x-coordinate and longitude as the y-coordinate.
+
+To incorporate real data into the state, you can join the latitude and longitude variables to a data frame you want to show the statistics for.
+
+```{r}
+ny_stats <- county %>%
+mutate(county = str_to_lower(name)) %>%
+  filter(state == "New York") 
+ny_stats$name = tolower(ny_stats$name)
+ny_stats$name = gsub(' county', '', ny_stats$name)
+ny_full <- left_join(county_df, ny_stats, by = c("subregion" = "name"))
+```
+
+In the code above, we connected some county-by-county metrics to our map. Now we can create some cool data visualizations.
+
+```{r}
+ggplot(data = ny_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = avg_family_size)) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void() +
+  scale_fill_distiller(direction = 1)
+```
+
+The above map shows the average family size by county in the state of NY. Unfortunately there is no data for St. Lawrence county.
+
+*.rmd will not knit because it cannot load the "county_2019" df for some reason. I hope the .rmd is sufficient.*
