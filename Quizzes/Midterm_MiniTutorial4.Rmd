@@ -1,0 +1,86 @@
+---
+title: "Midterm_MiniTutorial4"
+author: "Jack Sylvia"
+date: "3/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The goal of this tutorial to give an introduction to making applications with shiny as well as utilizing reactivity within this context.
+
+To start, let us create a simple shiny app. A shiny app contains two parts: a server anda UI. The UI, or user interface, is what the user can interact with when using the shiny app. The server provides the data that will be sent to the display for the user.
+
+A basic shiny app is created below:
+
+```{r}
+library(shiny)
+
+ui <- fluidPage(
+  "Hello, world!"
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
+
+First we load in the shiny package, Then we store the UI as an object. In this case, there is no interactivity with the user as the phrase "Here We Go Saints!" is shown as text on the screen. In this case, the server has nothing to add as we just want to display text. Lastly, to run the shinyApp you join your "ui" and "server" within the "shinyApp()" function.
+
+Now, we can create more complex shiny applications to include more data and interactivity. To show this, we will again be using the NCAA basketball data
+
+```{r}
+library(tidyverse)
+library(here)
+library(ggplot2)
+NCAA_df <- read.csv(here("data/ncaa-team-data.csv"))
+
+NCAA_new <- NCAA_df %>%
+  separate(season, into = c("year", "year plus one", "Delete"), sep = "-") %>%
+  select(-c("year plus one", "Delete"))
+
+NCAA_final <- NCAA_new %>%
+  filter(year >= 2012, conf == "ACC")
+
+  
+
+library(shiny)
+ui2 <- fluidPage(
+  sidebarLayout(sidebarPanel(
+      selectizeInput("yearchoice", label = "Year", choices = NCAA_final$year)),
+    mainPanel(plotOutput("ncaaplot"))
+  )
+)
+
+server2 <- function(input, output, session) {
+  
+  
+  df_update <- reactive({
+  
+    NCAA_stat <- NCAA_final %>% filter(year == input$yearchoice)
+
+  })
+  
+  NCAA_plot <- reactive ({
+    ggplot(df_update(), aes(x = school, y = w)) + 
+             geom_point() +
+      theme(axis.text.x = element_text(angle = 90)) + 
+  ylab("wins")
+  
+  })
+  
+  output$ncaaplot <- renderPlot({
+    NCAA_plot()
+  })
+}
+
+shinyApp(ui2, server2)
+```
+
+The shinyApp above utilizes reactivity. In the UI, the code containing selectizeInput allows the user to select all levels of the year variable. Based on what the user selects, the dataset call df_update in the server2 object will change. This then allows the plot to be reactive based upon which year the user selects.
+
+This technique allows the user to be more engaged and to really analyze what they seeing. 
