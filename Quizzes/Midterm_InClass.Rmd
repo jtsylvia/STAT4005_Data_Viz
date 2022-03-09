@@ -1,0 +1,181 @@
+---
+title: "Midterm_InClass"
+author: "Jack Sylvia"
+date: "3/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+“All work presented is my own. I have not communicated with or worked with anyone else on this exam.” -Jack Sylvia
+
+## Question 1
+
+a) <DATA>, <MAPPINGS>, <GEOM_FUNCTION>, and <STAT> are explicitly specified in the code.
+
+b) In the Data Visualization reading it was discussed how important it was to have a stable baseline in stacked bar chart. In this case, it is still good to have a stable baseline -- even though it is not a stacked bar chart -- so that we can compare each pokemon relative to the one with the highest count. The ensures the reader compares each Pokemon to the same pokemon so only fair conclusions can be met.
+
+c) O should be included for bar and lollipop plots because the bars encode their variables as lengths. If you did not include 0, you would be falsely illustrating the length. It is okay to omit 0 from a point plot because it is a point on a plane; not including 0 does not change its position.
+
+## Question 2
+
+Done
+
+## Question 3
+
+I learned that when omitting data for various --but good-- reasons that you must state precisely why you are removing the specific data. This gives the reader knowledge that there are data points not shown AND that the author of the visualization is not trying to manipulate them.
+
+## Question 4
+
+a)
+
+```{r}
+library(maps)
+library(tidyverse)
+library(here)
+election_df <- read_csv(here("data/2020_county_pres.csv")) %>%
+  group_by(state_name) %>%
+  summarise(total_gop = sum(votes_gop),
+            total_dem = sum(votes_dem)) %>%
+  mutate(percent_gop = 100 * total_gop / (total_gop + total_dem)) %>%
+  mutate(state_name = str_to_lower(state_name))
+
+state_df <- ggplot2::map_data("state")
+
+state_full <- left_join(state_df, election_df, by = c("region" = "state_name"))
+
+ggplot(data = state_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = percent_gop)) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void() +
+  scale_fill_distiller(palette = "OrRd")
+```
+
+b) The data frame in R is much longer than 50 rows because it needs to map out the borders of every state. This includes a ton of latitude and longitude locations in order to make the map actually look like the U.S. If there were only 50 rows, the map would look jagged and ugly.
+
+## Question 5 ***
+
+```{r}
+library(shiny)
+library(tidyverse)
+library(ggrepel)
+library(here)
+alcohol_df <- read_csv(here("data/alcohol.csv"))
+
+onecountry_df <- alcohol_df %>% filter(country == "Australia")
+
+ggplot(alcohol_df, aes(x = beer_servings, y = wine_servings)) +
+  geom_point() +
+  geom_label_repel(data = onecountry_df, aes(label = country)) +
+  geom_point(data = onecountry_df, size = 3, shape = 1)
+
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+      selectizeInput("countrychoice", label = "Country", choices = alcohol_df$country),
+      radioButtons("VariableChoice", label = "Choose a Variable", choices = c("beer_servings", "spirit_servings", "wine_servings"))),
+    mainPanel(plotOutput("scatterplot"),
+              plotOutput("histogram"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  
+  df_update <- reactive({
+  
+    alcohol_onecountry <- alcohol_df %>% filter(country == input$countrychoice)
+
+  })
+  
+  alcohol_plot <- reactive ({
+    ggplot(alcohol_df, aes(x = beer_servings, y = wine_servings)) +
+  geom_point() +
+  geom_label_repel(data = df_update(), aes(label = country)) +
+  geom_point(data = df_update(), size = 3, shape = 1)
+  
+  })
+  
+  alcohol_histogram <- reactive ({
+    ggplot(alcohol_df, aes(x = input$VariableChoice)) +
+  geom_histogram(stat = "count") +
+      xlab(input$VariableChoice)
+  })
+
+  
+  output$scatterplot <- renderPlot({
+    alcohol_plot()
+  })
+  
+  output$histogram <- renderPlot({
+    alcohol_histogram()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+## Question 6
+
+Done on paper
+
+
+## Question 7
+
+```{r}
+library(tidyverse)
+library(here)
+wta_df <- read_csv(here("data/wta_matches_2019.csv"))
+wta_long <- wta_df %>% pivot_longer(c(winner_name, loser_name),
+                                    names_to = "won_or_lost",
+                                    values_to = "player") %>%
+  select(won_or_lost, player, everything())
+
+wta_new <- wta_long %>%
+  mutate(aces = if_else(won_or_lost == "winner_name", w_ace, l_ace)) %>%
+  group_by(player) %>%
+  summarise(
+    AvgAces = mean(aces),
+    nmatches = n()
+  ) %>%
+  filter(nmatches >= 20) %>%
+  arrange(desc(AvgAces)) %>%
+  slice_head(n = 20)
+
+ggplot(data = wta_new, aes(x = player, y = AvgAces)) +
+  geom_point(size=3, color = "red", shape=18) + 
+  coord_flip() + 
+  geom_segment(aes(x=player, xend=player, y=0, yend=AvgAces-0.1), linetype="solid", colour="brown")
+```
+
+
+## Question 8
+
+a) This plot might not be the best because it does not show how much variability each player has in the amount of aces they get per game. We can fix this by indicating standard error measurements scatterplot instead of using a lollipop chart.
+
+b)
+
+```{r}
+wta_new2 <- wta_long %>%
+  mutate(aces = if_else(won_or_lost == "winner_name", w_ace, l_ace)) %>%
+  group_by(player) %>%
+  summarise(
+    AvgAces = mean(aces),
+    nmatches = n(),
+    std_dev_Aces = (var(aces))^0.5
+  ) %>%
+  ungroup() %>%
+  mutate(se = std_dev_Aces / nmatches, l_se = AvgAces - se, u_se = AvgAces + se) %>%
+  filter(nmatches >= 20) %>%
+  arrange(desc(AvgAces)) %>%
+  slice_head(n = 20)
+
+ggplot(data = wta_new2, aes(x = player, y = AvgAces)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = l_se, ymax = u_se)) + 
+  coord_flip()
+```
+
